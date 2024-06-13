@@ -1,0 +1,36 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+before_script:
+  - echo "Setting up environment"
+  - python -m pip install --upgrade pip
+  - pip install -r requirements.txt
+
+build:
+  stage: build
+  script:
+    - echo "Building Docker image"
+    - docker build -t your-dockerhub-username/ml_final:$CI_COMMIT_SHA .
+  only:
+    - main
+
+test:
+  stage: test
+  script:
+    - echo "Running tests"
+    - pytest tests/
+  only:
+    - merge_requests
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying application"
+    - docker push your-dockerhub-username/ml_final:$CI_COMMIT_SHA
+  only:
+    - main
