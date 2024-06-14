@@ -1,4 +1,3 @@
-# Используем базовый образ Python
 FROM python:3.8-slim
 
 # Устанавливаем зависимости
@@ -8,8 +7,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копируем исходный код
 COPY src/ /app/src/
 COPY data/ /app/data/
+COPY models/ /app/models/
 
 WORKDIR /app
 
 # Запускаем скрипт при старте контейнера
-CMD ["python", "src/data_processing.py"]
+CMD ["python", "src/predict.py"]
