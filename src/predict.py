@@ -1,20 +1,10 @@
 import pandas as pd
 import joblib
+import os
+from sklearn.metrics import mean_squared_error
 
 def load_data(file_path):
     return pd.read_csv(file_path)
-
-def process_data(df, scaler):
-    # Заполнение пропусков
-    df['Age'].fillna(df['Age'].median(), inplace=True)
-    
-    # Преобразование категориальных переменных
-    df['Sex'] = df['Sex'].map({'male': 0, 'female': 1})
-    
-    # Нормализация данных
-    df[['Pclass', 'Age']] = scaler.transform(df[['Pclass', 'Age']])
-    
-    return df
 
 def load_model(model_path):
     return joblib.load(model_path)
@@ -24,19 +14,36 @@ def predict(model, df):
     predictions = model.predict(X)
     return predictions
 
-if __name__ == '__main__':
-    # Загрузка данных
-    df = load_data('data/raw/new_data.csv')  # Предположим, что это новые данные для предсказания
+def calculate_metrics(y_true, y_pred):
+    mse = mean_squared_error(y_true, y_pred)
+    return mse
+
+def save_predictions(predictions, file_path):
+    pd.DataFrame(predictions, columns=['Prediction']).to_csv(file_path, index=False)
+    print(f'Predictions saved to {file_path}')
+
+def main():
+    # Load processed data for prediction
+    file_path = '../data/processed/processed_data.csv'
+    df = load_data(file_path)
     
-    # Загрузка обученного скалера
-    scaler = joblib.load('models/scaler.pkl')
+    # Load trained model
+    model = load_model('../models/pretrained_model.pkl')
     
-    # Предобработка данных
-    df = process_data(df, scaler)
+    # Load true labels (Survived column)
+    y_true = df['Survived']
     
-    # Загрузка обученной модели
-    model = load_model('models/pretrained_model.pkl')
-    
-    # Предсказание
+    # Make predictions
     predictions = predict(model, df)
-    print(predictions)
+    
+    # Save predictions to file
+    predictions_file = '../predictions/predictions.csv'
+    save_predictions(predictions, predictions_file)
+
+    # Calculate MSE
+    mse = calculate_metrics(y_true, predictions)
+    print(f'Mean Squared Error (MSE): {mse:.4f}')
+
+if __name__ == '__main__':
+    main()
+
