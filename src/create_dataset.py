@@ -10,14 +10,11 @@ def main():
     # Загружаем датасет
     train, _ = titanic()
 
-    # Выбираем необходимые колонки
-    dataset = train[['Pclass', 'Sex', 'Age']]
-
     # Путь для сохранения файла CSV
     output_file = os.path.join(output_dir, 'titanic_dataset.csv')
 
     # Сохраняем датасет в файл CSV
-    dataset.to_csv(output_file, index=False)
+    train.to_csv(output_file, index=False)
 
     print(f'Dataset сохранен в {output_file}')
 
