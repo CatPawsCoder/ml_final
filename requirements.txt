@@ -1,4 +1,4 @@
 pandas
 pytest
 joblib
-sklearn
+scikit-learn
